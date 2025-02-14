@@ -52,7 +52,6 @@ sealed class NavigationItem(var route: String, var icon: ImageVector?= null, var
     object Home : NavigationItem("home", Icons.Filled.Home, "Home")
     object Favorite : NavigationItem("favorite", Icons.Filled.Favorite, "Favorite")
     object Category : NavigationItem("category", Icons.Filled.Menu, "Category")
-    //object Meal : NavigationItem("meal/{mealId}?imageUrl={imageUrl}&mealName={mealName}&instructions={instructions}&youtubeLink={youtubeLink}")
 }
 
 @Composable
@@ -127,13 +126,11 @@ fun BottomNavigationBar(navController: NavController) {
             NavigationBarItem(
                 icon = { item.icon?.let{Icon(it, contentDescription = item.title)} },
                 label = { Text(item.title) },
-                selected = currentRoute == item.route,
+                selected = currentRoute?.startsWith(item.route) == true, // Improved selection logic
                 onClick = {
                     if (currentRoute != item.route) {
                         navController.navigate(item.route) {
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
-                            }
+                            popUpTo(NavigationItem.Home.route) { inclusive = false } // Ensuring proper backstack behavior
                             launchSingleTop = true
                             restoreState = true
                         }
@@ -146,6 +143,7 @@ fun BottomNavigationBar(navController: NavController) {
 
 @Composable
 fun NavigationGraph(navController: NavHostController, padding: Modifier,categoryViewModel: CategoryViewModel) {
+    val randomViewModel: RandomViewModel = viewModel()
     NavHost(
         navController,
         startDestination = NavigationItem.Home.route
@@ -153,15 +151,15 @@ fun NavigationGraph(navController: NavHostController, padding: Modifier,category
         composable(NavigationItem.Home.route) { Home(navController=navController) }
         composable(NavigationItem.Favorite.route) { Favorite() }
         composable(NavigationItem.Category.route) { Categories(categoryViewModel = categoryViewModel) }
-        composable("search") { Search() }
-        /*
+        composable("search") { Search(navController = navController) }
+
         composable(
             route = "random_meal_detail/{mealId}",
             arguments = listOf(navArgument("mealId") { type = NavType.StringType })
         ) { backStackEntry -> val mealId = backStackEntry.arguments?.getString("mealId")
-        //RandomMealDetailPage(mealId = mealId ?: "", navController = navController, randomViewModel = randomViewModel)
+        RandomMealDetailPage(mealId = mealId ?: "", navController = navController, randomViewModel = randomViewModel)
         }
-        */
+
         composable(
             route = "meal/{mealId}?imageUrl={imageUrl}&mealName={mealName}&instructions={instructions}&youtubeLink={youtubeLink}",
             arguments = listOf(
@@ -185,7 +183,6 @@ fun NavigationGraph(navController: NavHostController, padding: Modifier,category
                 mealName = mealName ?:"Meal name",
                 mealInstructions = instructions ?:"Recipe instructions",
                 youtubeLink = youtubeLink ?: "https://www.youtube.com/",
-                //navController = navController
             )
         }
     }
