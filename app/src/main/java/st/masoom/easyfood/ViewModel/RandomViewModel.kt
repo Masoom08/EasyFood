@@ -9,12 +9,12 @@ import kotlinx.coroutines.flow.StateFlow
 import st.masoom.easyfood.Pojo.Meal
 import st.masoom.easyfood.Retrofit.RetrofitInstance
 
-class RandomViewModel : ViewModel() {
+class RandomViewModel : ViewModel(), MealDetailProvider {
     private val _randomMeal = MutableStateFlow<Meal?>(null)
     val randomMeal: StateFlow<Meal?> get() = _randomMeal
 
     private val _mealDetails = MutableStateFlow<Meal?>(null)
-    val mealDetails: StateFlow<Meal?> get() = _mealDetails
+    override val mealDetailState: StateFlow<Meal?> get() = _mealDetails
 
     init {
         fetchRandomMeal()
@@ -30,11 +30,11 @@ class RandomViewModel : ViewModel() {
             }
         }
     }
-    fun fetchMealDetails(mealId: String) {
-        viewModelScope.launch {
+    override fun fetchMealDetails(mealId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response = RetrofitInstance.api.getMealDetails(mealId)
-                _mealDetails.value = response.meals?.firstOrNull() ?: null
+                _mealDetails.value = response.meals?.firstOrNull()
             } catch (e: Exception) {
                 _mealDetails.value = null
             }

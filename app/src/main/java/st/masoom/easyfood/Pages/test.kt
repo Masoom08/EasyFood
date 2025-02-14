@@ -40,13 +40,14 @@ import st.masoom.easyfood.Local.MealDatabase
 import st.masoom.easyfood.Local.MealEntity
 import st.masoom.easyfood.Local.MealRepository
 import st.masoom.easyfood.R
+import st.masoom.easyfood.ViewModel.MealDetailProvider
 import st.masoom.easyfood.ViewModel.RandomViewModel
 
 @Composable
 fun RandomMealDetailPage(
     mealId: String,
     navController: NavController,
-    randomViewModel: RandomViewModel
+    mealDetailProvider: MealDetailProvider // Can be RandomViewModel or SearchViewModel
 ) {
 
     val context = LocalContext.current
@@ -54,10 +55,10 @@ fun RandomMealDetailPage(
     val mealRepository = remember { MealRepository(database.mealDao()) }
     // Show a back button to navigate back to the home page
     LaunchedEffect(mealId) {
-        randomViewModel.fetchMealDetails(mealId)
+        mealDetailProvider.fetchMealDetails(mealId)
     }
 
-    val meal = randomViewModel.mealDetails.collectAsState().value
+    val meal by mealDetailProvider.mealDetailState.collectAsState()
     // State to track favorite status
     var isFavorite by remember { mutableStateOf(false) }
 

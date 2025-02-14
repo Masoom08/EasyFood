@@ -23,4 +23,7 @@ interface MealApi {
     @GET("lookup.php")
     suspend fun getMealDetails(@Query("i") mealId: String): MealResponse
 
+    @GET("filter.php")
+    suspend fun getMealsByCategory(@Query("c") category: String): MealListResponse
+
 }

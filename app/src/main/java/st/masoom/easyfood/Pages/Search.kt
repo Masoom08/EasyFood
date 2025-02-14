@@ -108,7 +108,9 @@ fun MealItem(meal: Meal, navController: NavController) {
             .padding(8.dp)
             .clickable {
                 navController.navigate(
-                    "mealDetail/${meal.idMeal}/${meal.strMealThumb}/${meal.strMeal}/${meal.strInstructions}/${meal.strYoutube}") }
+                    "search_meal_detail/${meal.idMeal}"
+                )
+            }
     ) {
         Image(
             painter = rememberImagePainter(data = meal.strMealThumb),

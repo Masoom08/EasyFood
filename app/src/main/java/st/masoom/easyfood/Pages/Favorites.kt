@@ -23,9 +23,13 @@ import coil.compose.rememberImagePainter
 import st.masoom.easyfood.Local.MealEntity
 import st.masoom.easyfood.ViewModel.FavoritesViewModel
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.navigation.NavController
 
 @Composable
-fun Favorite(viewModel: FavoritesViewModel = viewModel()) {
+fun Favorite(
+    navController : NavController,
+    viewModel: FavoritesViewModel = viewModel()
+) {
     val favoriteMeals by viewModel.allMeals.collectAsState(initial = emptyList())
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -41,7 +45,7 @@ fun Favorite(viewModel: FavoritesViewModel = viewModel()) {
         } else {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(favoriteMeals) { meal ->
-                    FavoriteMealItem(meal, viewModel)
+                    FavoriteMealItem(meal, viewModel,navController)
                 }
             }
         }
@@ -49,11 +53,15 @@ fun Favorite(viewModel: FavoritesViewModel = viewModel()) {
 }
 
 @Composable
-fun FavoriteMealItem(meal: MealEntity, viewModel: FavoritesViewModel) {
+fun FavoriteMealItem(meal: MealEntity, viewModel: FavoritesViewModel, navController: NavController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(8.dp)
+            .clickable {
+                // Navigate to RandomMealDetailPage with meal ID
+                navController.navigate("random_meal_detail/${meal.mealId}")
+            },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(

@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -25,11 +26,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import st.masoom.easyfood.ViewModel.CategoryViewModel
 
 @Composable
-fun Categories(categoryViewModel: CategoryViewModel) {
+fun Categories(categoryViewModel: CategoryViewModel, navController: NavController) {
     val categories = categoryViewModel.categories.observeAsState(emptyList())
 
     Column(
@@ -37,9 +39,6 @@ fun Categories(categoryViewModel: CategoryViewModel) {
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        // Heading
-
-
         // Grid Layout with 2 Columns
         LazyVerticalGrid(
             columns = GridCells.Fixed(2), // 2 columns
@@ -52,6 +51,7 @@ fun Categories(categoryViewModel: CategoryViewModel) {
             items(categories.value) { category ->
                 CategoryCard(category = category) {
                     // Handle click on category (e.g., navigate to category details)
+                    navController.navigate("category_meals/${category.strCategory}")
                 }
             }
         }
@@ -66,10 +66,9 @@ fun CategoryCard(category: PojoCategory, onClick: () -> Unit) {
             .fillMaxWidth()
             .height(150.dp)
             .clickable { onClick() },
-        colors = androidx.compose.material3.CardDefaults.cardColors(
-            containerColor = Color.White
-    ),
-    border = BorderStroke(1.dp, Color.Gray) ){
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        border = BorderStroke(1.dp, Color.Gray)
+    ){
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
