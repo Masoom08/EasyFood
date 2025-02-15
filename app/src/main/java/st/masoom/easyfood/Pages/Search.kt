@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
@@ -43,7 +44,7 @@ import androidx.compose.ui.draw.clip
 
 @OptIn(ExperimentalMaterial3Api::class) // Suppress experimental API warning
 @Composable
-fun Search(viewModel: SearchViewModel = viewModel()) {
+fun Search(navController: NavController,viewModel: SearchViewModel = viewModel()) {
     var query by remember { mutableStateOf(TextFieldValue("")) }
     val searchResults by viewModel.searchResults.collectAsState()
 
@@ -64,15 +65,12 @@ fun Search(viewModel: SearchViewModel = viewModel()) {
             singleLine = true,
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 containerColor = Color.Transparent, // Use the background modifier color
-
                 focusedBorderColor = Color.Transparent, // Remove focused border
                 unfocusedBorderColor = Color.Transparent, // Remove unfocused border
                 cursorColor = MaterialTheme.colorScheme.primary, // Primary color for the cursor
 
             ),
-            keyboardOptions = KeyboardOptions.Default.copy(
-                imeAction = ImeAction.Search
-            ),
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
             keyboardActions = KeyboardActions(
                 onSearch = {
                     if (query.text.isNotBlank()) {
@@ -95,7 +93,7 @@ fun Search(viewModel: SearchViewModel = viewModel()) {
         } else {
             LazyColumn {
                 items(searchResults ?: emptyList()) { meal ->
-                    MealItem(meal)
+                    MealItem(meal,navController)
                 }
             }
         }
@@ -103,8 +101,17 @@ fun Search(viewModel: SearchViewModel = viewModel()) {
 }
 
 @Composable
-fun MealItem(meal: Meal) {
-    Row(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+fun MealItem(meal: Meal, navController: NavController) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .clickable {
+                navController.navigate(
+                    "search_meal_detail/${meal.idMeal}"
+                )
+            }
+    ) {
         Image(
             painter = rememberImagePainter(data = meal.strMealThumb),
             contentDescription = null,
